@@ -61,7 +61,7 @@ class ApiHelper implements ProtectedContextAwareInterface
             throw new Exception(sprintf("id-string or ProductReference was expected but %s given" , get_class($productReference)));
         }
 
-        $data = $this->apiService->apiCall($shopIdentifier, 'product/' . $id);
+        $data = $this->apiService->apiCall($shopIdentifier, 'SitegeistProduct/' . $id);
         $product =  $this->productSerializer->deserialize($data);
         return $product;
     }
@@ -74,7 +74,7 @@ class ApiHelper implements ProtectedContextAwareInterface
      */
     public function getProductReferences($shopIdentifier = 'default', $filter = null, $categoryReferences = [] )
     {
-        $data = $this->apiService->apiCall($shopIdentifier, 'product');
+        $data = $this->apiService->apiCall($shopIdentifier, 'SitegeistProduct');
         $productReferences = $this->productReferenceSerializer->deserializeArray($data);
         return $productReferences;
     }
@@ -94,7 +94,7 @@ class ApiHelper implements ProtectedContextAwareInterface
             throw new Exception(sprintf("id-string or CategoryReference was expected but %s given" , get_class($categoryReference)));
         }
 
-        $data = $this->apiService->apiCall($shopIdentifier, 'productCategory/' . $id);
+        $data = $this->apiService->apiCall($shopIdentifier, 'SitegeistProductCategory/' . $id);
         $category =  $this->categorySerializer->deserialize($data);
         return $category;
     }
@@ -105,7 +105,7 @@ class ApiHelper implements ProtectedContextAwareInterface
      */
     public function getCategoryReferences($shopIdentifier = 'default')
     {
-        $data = $this->apiService->apiCall($shopIdentifier, 'productCategory');
+        $data = $this->apiService->apiCall($shopIdentifier, 'SitegeistProductCategory');
         $categoryReference = $this->categoryReferenceSerializer->deserializeArray($data);
         return $categoryReference;
     }
