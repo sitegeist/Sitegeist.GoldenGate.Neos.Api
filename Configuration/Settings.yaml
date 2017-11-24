@@ -1,0 +1,29 @@
+Sitegeist:
+  GoldenGate:
+    Neos:
+      Api:
+        enableCache: true
+
+        shops:
+          default:
+            title: 'default'
+
+            protocol: ~
+            host: ~
+            port: ~
+            base: ~
+
+            user: ~
+            password: ~
+
+Neos:
+  Fusion:
+    defaultContext:
+      Shopware.Api: 'Sitegeist\GoldenGate\Neos\Api\Eel\ApiHelper'
+      Shopware.Caching: 'Sitegeist\GoldenGate\Neos\Api\Eel\CachingHelper'
+
+  Flow:
+    mvc:
+      routes:
+        Sitegeist.GoldenGate.Neos.Api:
+          position: 'before Neos.Neos'

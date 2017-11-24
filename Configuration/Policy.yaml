@@ -1,0 +1,27 @@
+#                                                                        #
+# Security policy for the Sitegeist.Shopware.Api package                 #
+#                                                                        #
+
+privilegeTargets:
+
+  'Neos\Flow\Security\Authorization\Privilege\Method\MethodPrivilege':
+
+    'Sitegeist.Goldengate.Neos.Api:Events':
+      matcher: 'method(Sitegeist\Shopware\Api\Controller\EventController->(product|category)Action())'
+
+roles:
+
+#
+# @TODO: at some point we will have to add a special user role here that is authenticated via http-basic
+#
+#  'Sitegeist.Goldengate:EventApi':
+#    privileges:
+#      -
+#        privilegeTarget: 'Sitegeist.Goldengate.Neos.Api:Events'
+#        permission: GRANT
+
+  'Neos.Flow:Everybody':
+    privileges:
+      -
+        privilegeTarget: 'Sitegeist.Goldengate.Neos.Api:Events'
+        permission: GRANT

@@ -1,0 +1,26 @@
+'Sitegeist\GoldenGate\Neos\Api\Controller\EventController':
+  properties:
+    fusionContentCache:
+      object:
+        factoryObjectName: Neos\Flow\Cache\CacheManager
+        factoryMethodName: getCache
+        arguments:
+          1:
+            value: Neos_Fusion_Content
+    shopwareApiCache:
+      object:
+        factoryObjectName: Neos\Flow\Cache\CacheManager
+        factoryMethodName: getCache
+        arguments:
+          1:
+            value: Sitegeist_Goldengate_Neos_Api
+
+'Sitegeist\GoldenGate\Neos\Api\Aspect\ApiCachingAspect':
+  properties:
+    shopwareApiCache:
+      object:
+        factoryObjectName: Neos\Flow\Cache\CacheManager
+        factoryMethodName: getCache
+        arguments:
+          1:
+            value: Sitegeist_Goldengate_Neos_Api

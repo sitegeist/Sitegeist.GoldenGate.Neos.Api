@@ -1,0 +1,19 @@
+{
+    "description": "",
+    "type": "neos-plugin",
+    "name": "sitegeist/goldengate-neos-api",
+    "require": {
+        "neos/flow": "*",
+        "sitegeist/goldengate-dto": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Sitegeist\\GoldenGate\\Neos\\Api\\": "Classes/"
+        }
+    },
+    "extra": {
+        "neos": {
+            "package-key": "Sitegeist.GoldenGate.Neos.Api"
+        }
+    }
+}
