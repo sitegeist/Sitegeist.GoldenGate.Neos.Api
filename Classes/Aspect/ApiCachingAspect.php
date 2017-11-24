@@ -3,7 +3,7 @@ namespace Sitegeist\GoldenGate\Neos\Api\Aspect;
 
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Aop\JoinPointInterface;
-use Neos\Cache\Frontend\VariableFrontend;
+use Neos\Cache\Frontend\StringFrontend;
 use Sitegeist\GoldenGate\Neos\Api\Eel\CachingHelper;
 
 /**
@@ -14,7 +14,7 @@ class ApiCachingAspect
 {
     /**
      * @Flow\Inject
-     * @var VariableFrontend
+     * @var StringFrontend
      */
     protected $shopwareApiCache;
 
@@ -25,7 +25,7 @@ class ApiCachingAspect
     protected $shopwareTagHelper;
 
     /**
-     * @Flow\Around("setting(Sitegeist.GoldenGate.Neos.Api.enableCache) && method(Sitegeist\GoldenGate\Neos\Api\Eel\ApiHelper->(getProduct|getCategory)())")
+     * @Flow\Around("setting(Sitegeist.GoldenGate.Neos.Api.enableCache) && method(Sitegeist\GoldenGate\Neos\Api\Eel\ApiHelper->(product|category)())")
      * @param JoinPointInterface $joinPoint The current join point
      * @return mixed
      */
@@ -41,14 +41,14 @@ class ApiCachingAspect
             $this->shopwareApiCache->set(
                 $entryIdentifier,
                 serialize($result),
-                [$this->shopwareTagHelper->itemTag($result)]
+                [$this->shopwareTagHelper->itemTag($arguments['shopIdentifier'], $result)]
             );
         }
         return $result;
     }
 
     /**
-     * @Flow\Around("setting(Sitegeist.GoldenGate.Neos.Api.enableCache) && method(Sitegeist\GoldenGate\Neos\Api\Eel\ApiHelper->(getProductReferences|getCategoryReferences)())")
+     * @Flow\Around("setting(Sitegeist.GoldenGate.Neos.Api.enableCache) && method(Sitegeist\GoldenGate\Neos\Api\Eel\ApiHelper->(productReferences|categoryReferences)())")
      * @param JoinPointInterface $joinPoint The current join point
      * @return mixed
      */
@@ -64,7 +64,7 @@ class ApiCachingAspect
             $this->shopwareApiCache->set(
                 $entryIdentifier,
                 serialize($result),
-                $this->shopwareTagHelper->listTag($result)
+                $this->shopwareTagHelper->listTag($arguments['shopIdentifier'], $result)
             );
         }
         return $result;

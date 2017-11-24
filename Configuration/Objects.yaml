@@ -13,7 +13,7 @@
         factoryMethodName: getCache
         arguments:
           1:
-            value: Sitegeist_Goldengate_Neos_Api
+            value: Sitegeist_GoldenGate_Neos_Api
 
 'Sitegeist\GoldenGate\Neos\Api\Aspect\ApiCachingAspect':
   properties:
@@ -23,4 +23,4 @@
         factoryMethodName: getCache
         arguments:
           1:
-            value: Sitegeist_Goldengate_Neos_Api
+            value: Sitegeist_GoldenGate_Neos_Api

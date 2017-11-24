@@ -25,7 +25,7 @@ class ApiService
      *
      * @param string $shopIdentifier
      * @param string $path
-     * @param array $parameters
+     * @param string $response
      */
     public function apiCall($shopIdentifier, $path, $parameters = [])
     {
@@ -50,14 +50,12 @@ class ApiService
             'Basic ' . base64_encode($shopConfiguration['user'] . ':' . $shopConfiguration['password'])
         );
 
-        $response = $this->browser->sendRequest($request);
+        $response = $browser->sendRequest($request);
 
-        if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300 ){
-            $data = json_decode($response->getContent(), true);
+        if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
+            return $response->getContent();
         } else {
-            $data = null;
+            return '';
         }
-
-        return $data;
     }
 }

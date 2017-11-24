@@ -10,7 +10,7 @@ namespace Sitegeist\GoldenGate\Neos\Api\Service;
 
 use Neos\Flow\Annotations as Flow;
 use Neos\Utility\Arrays;
-
+use Sitegeist\GoldenGate\Neos\Api\Exception;
 
 class ConfigurationService
 {

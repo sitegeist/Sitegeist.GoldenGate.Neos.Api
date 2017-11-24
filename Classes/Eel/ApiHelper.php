@@ -47,11 +47,22 @@ class ApiHelper implements ProtectedContextAwareInterface
     protected $categoryReferenceSerializer;
 
     /**
+     * ApiHelper constructor.
+     */
+    public function __construct()
+    {
+        $this->productSerializer = new ProductSerializer();
+        $this->productReferenceSerializer = new ProductReferenceSerializer();
+        $this->categorySerializer = new CategorySerializer();
+        $this->categoryReferenceSerializer = new CategoryReferenceSerializer();
+    }
+
+    /**
      * @param string|ProductReference $productReference
      * @param string $shopIdentifier
      * @return Product
      */
-    public function getProduct($productReference, $shopIdentifier = 'default')
+    public function product($productReference, $shopIdentifier = 'default')
     {
         if ($productReference instanceof ProductReference) {
             $id = $productReference->getId();
@@ -72,10 +83,10 @@ class ApiHelper implements ProtectedContextAwareInterface
      * @param CategoryReferences[] $categoryReferences
      * @return ProductReference[]
      */
-    public function getProductReferences($shopIdentifier = 'default', $filter = null, $categoryReferences = [] )
+    public function productReferences($shopIdentifier = 'default', $filter = null, $categoryReferences = [] )
     {
-        $data = $this->apiService->apiCall($shopIdentifier, 'SitegeistProduct');
-        $productReferences = $this->productReferenceSerializer->deserializeArray($data);
+        $jsonData = $this->apiService->apiCall($shopIdentifier, 'SitegeistProduct');
+        $productReferences = $this->productReferenceSerializer->deserializeArray($jsonData);
         return $productReferences;
     }
 
@@ -84,7 +95,7 @@ class ApiHelper implements ProtectedContextAwareInterface
      * @param string $shopIdentifier
      * @return Product
      */
-    public function getCategory($categoryReference, $shopIdentifier = 'default')
+    public function category($categoryReference, $shopIdentifier = 'default')
     {
         if ($categoryReference instanceof CategoryReference) {
             $id = $categoryReference->getId();
@@ -103,7 +114,7 @@ class ApiHelper implements ProtectedContextAwareInterface
      * @param string $shopIdentifier
      * @return CategoryReference[]
      */
-    public function getCategoryReferences($shopIdentifier = 'default')
+    public function categoryReferences($shopIdentifier = 'default')
     {
         $data = $this->apiService->apiCall($shopIdentifier, 'SitegeistProductCategory');
         $categoryReference = $this->categoryReferenceSerializer->deserializeArray($data);
@@ -118,7 +129,7 @@ class ApiHelper implements ProtectedContextAwareInterface
      */
     public function allowsCallOfMethod($methodName)
     {
-        return false;
+        return true;
     }
 
 }
