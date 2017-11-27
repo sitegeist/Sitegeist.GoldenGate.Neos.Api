@@ -36,11 +36,11 @@ class CachingHelper implements ProtectedContextAwareInterface
         switch (true) {
             case $structure instanceof Product:
             case $structure instanceof ProductReference:
-                return self::PRODUCT_TAG_PREFIX . '_' . $shopIdentifier . '_' . $structure->getId();
+                return $this->sanitzeTagIdentifier(self::PRODUCT_TAG_PREFIX . '_' . $shopIdentifier . '_' . $structure->getId());
                 break;
             case $structure instanceof Category:
             case $structure instanceof CategoryReference:
-                return self::CATEGORY_TAG_PREFIX . '_' . $shopIdentifier . '_' . $structure->getId();
+                return $this->sanitzeTagIdentifier(self::CATEGORY_TAG_PREFIX . '_' . $shopIdentifier . '_' . $structure->getId());
                 break;
             default:
                 throw new \Sitegeist\GoldenGate\Neos\Api\Exception(sprintf("Could not create tag for structure-item of type %s", get_class($structure)));
@@ -60,6 +60,16 @@ class CachingHelper implements ProtectedContextAwareInterface
             },
             $structures
         );
+    }
+
+    /**
+     * Replace all characters that are not alphanumeric with underscores
+     *
+     * @param string $tagIdentifier
+     * @return string
+     */
+    protected function sanitzeTagIdentifier(string $tagIdentifier) {
+        return preg_replace('/[^a-zA-Z0-9_-]/u', '_', $tagIdentifier);
     }
 
     /**
