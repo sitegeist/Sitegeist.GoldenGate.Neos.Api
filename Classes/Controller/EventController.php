@@ -6,8 +6,10 @@ use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Mvc\Controller\ActionController;
 use Neos\Flow\Mvc\View\JsonView;
 
-use Sitegeist\GoldenGate\Dto\Serializer\ProductReferenceSerializer;
-use Sitegeist\GoldenGate\Dto\Serializer\CategoryReferenceSerializer;
+use Sitegeist\Goldengate\Dto\Serializer\ProductSerializer;
+use Sitegeist\Goldengate\Dto\Serializer\ProductReferenceSerializer;
+use Sitegeist\Goldengate\Dto\Serializer\CategorySerializer;
+use Sitegeist\Goldengate\Dto\Serializer\CategoryReferenceSerializer;
 
 use Sitegeist\GoldenGate\Neos\Api\Eel\CachingHelper;
 use Sitegeist\GoldenGate\Neos\Api\Service\ConfigurationService;
@@ -45,61 +47,70 @@ class EventController extends ActionController
     protected $fusionContentCache;
 
     /**
-     * @var ProductSerializer
-     */
-    protected $productSerializer;
-
-    /**
-     * @var ProductReferenceSerializer
-     */
-    protected $productReferenceSerializer;
-
-    /**
-     * @var CategorySerializer
-     */
-    protected $categorySerializer;
-
-    /**
-     * @var CategoryReferenceSerializer
-     */
-    protected $categoryReferenceSerializer;
-
-    protected function __construct()
-    {
-        $this->productReferenceSerializer = new ProductReferenceSerializer();
-        $this->categoryReferenceSerializer = new CategoryReferenceSerializer();
-    }
-
-    /**
      * Notify about changes for a specific product
      *
-     * @param string $product
-     * @param string $apiToken
      * @param string $shopIdentifier
+     * @param string $product
+     * @param string $productReference
      */
-    public function productAction($product, $shopIdentifier = 'default') {
-        $productReference = $this->productSerializer->deserialize($product);
-        $this->flushCachesByTag($this->shopwareTagHelper->itemTag($shopIdentifier, $productReference));
+    public function productAction($shopIdentifier = 'default', $product = null, $productReference = null)
+    {
+        if (!$this->configurationService->hasShopConfiguration($shopIdentifier)) {
+            $this->throwStatus(401, 'No viable input');
+        }
+
+        if ($product) {
+            $productSerializer = new ProductSerializer();
+            $product = $productSerializer->deserialize($product);
+            $productTag = $this->shopwareTagHelper->itemTag($shopIdentifier, $product);
+            $this->flushCachesByTag($productTag);
+        } elseif ($productReference) {
+            $productReferenceSerializer = new ProductReferenceSerializer();
+            $productReference = $productReferenceSerializer->deserialize($productReference);
+            $productTag = $this->shopwareTagHelper->itemTag($shopIdentifier, $productReference);
+            $this->flushCachesByTag($productTag);
+        } else {
+            $this->throwStatus(401, 'No viable input');
+        }
         $this->view->assign('value', ['success' => true]);
     }
 
     /**
      * Notify about changes for a specific category
-     *
-     * @param string $category
-     * @param string $apiToken
+
      * @param string $shopIdentifier
+     * @param string $category
+     * @param string $categoryReference
      */
-    public function categoryAction($category, $shopIdentifier = 'default') {
-        $categoryReference = $this->categoryReferenceSerializer->deserialize($category);
-        $this->flushCachesByTag($this->shopwareTagHelper->itemTag($shopIdentifier, $categoryReference));
+    public function categoryAction($shopIdentifier = 'default', $category = null, $categoryReference = null)
+    {
+        if (!$this->configurationService->hasShopConfiguration($shopIdentifier)) {
+            $this->throwStatus(401, 'No viable input');
+        }
+
+        if ($category) {
+            $categorySerializer = new CategorySerializer();
+            $category = $categorySerializer->deserialize($category);
+            $categoryTag = $this->shopwareTagHelper->itemTag($shopIdentifier, $category);
+            $this->flushCachesByTag($categoryTag);
+
+        } elseif ($categoryReference) {
+            $categoryReferenceSerializer = new CategoryReferenceSerializer();
+            $categoryReference = $categoryReferenceSerializer->deserialize($category);
+            $categoryTag = $this->shopwareTagHelper->itemTag($shopIdentifier, $categoryReference);
+            $this->flushCachesByTag($categoryTag);
+        } else {
+            $this->throwStatus(401, 'No viable input found');
+        }
+
         $this->view->assign('value', ['success' => true]);
     }
 
     /**
      * @param string $tag
      */
-    protected function flushCachesByTag($tag) {
+    protected function flushCachesByTag($tag)
+    {
         $this->fusionContentCache->flushByTag($tag);
         $this->shopwareApiCache->flushByTag($tag);
     }

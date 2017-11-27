@@ -3,7 +3,7 @@
 
 -
   name:  'Shopware-Event-Api'
-  uriPattern: 'sitegeist/goldenhate//events/{@action}'
+  uriPattern: 'sitegeist/goldenhate/events/{@action}'
   defaults:
     '@package':    'Sitegeist.Goldengate.Neos.Api'
     '@controller': 'Event'
