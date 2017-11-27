@@ -62,7 +62,7 @@ class ApiHelper implements ProtectedContextAwareInterface
      * @param string $shopIdentifier
      * @return Product
      */
-    public function product($productReference, $shopIdentifier = 'default')
+    public function product($shopIdentifier = 'default', $productReference)
     {
         if ($productReference instanceof ProductReference) {
             $id = $productReference->getId();

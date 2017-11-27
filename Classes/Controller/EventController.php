@@ -1,10 +1,10 @@
 <?php
 namespace Sitegeist\GoldenGate\Neos\Api\Controller;
 
-use Neos\Cache\Frontend\FrontendInterface;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Mvc\Controller\ActionController;
 use Neos\Flow\Mvc\View\JsonView;
+use Neos\Cache\Frontend\FrontendInterface;
 
 use Sitegeist\Goldengate\Dto\Serializer\ProductSerializer;
 use Sitegeist\Goldengate\Dto\Serializer\ProductReferenceSerializer;

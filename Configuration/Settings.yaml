@@ -6,7 +6,7 @@ Sitegeist:
 
         shops:
           default:
-            title: 'default'
+            title: 'Default Shop'
 
             protocol: ~
             host: ~
