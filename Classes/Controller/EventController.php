@@ -96,7 +96,7 @@ class EventController extends ActionController
 
         } elseif ($categoryReference) {
             $categoryReferenceSerializer = new CategoryReferenceSerializer();
-            $categoryReference = $categoryReferenceSerializer->deserialize($category);
+            $categoryReference = $categoryReferenceSerializer->deserialize($categoryReference);
             $categoryTag = $this->shopwareTagHelper->itemTag($shopIdentifier, $categoryReference);
             $this->flushCachesByTag($categoryTag);
         } else {
