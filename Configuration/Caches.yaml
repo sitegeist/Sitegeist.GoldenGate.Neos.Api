@@ -2,4 +2,4 @@ Sitegeist_GoldenGate_Neos_Api:
   frontend: Neos\Cache\Frontend\StringFrontend
   backend: Neos\Cache\Backend\FileBackend
   backendOptions:
-    defaultLifetime: 3600
+    defaultLifetime: 86400

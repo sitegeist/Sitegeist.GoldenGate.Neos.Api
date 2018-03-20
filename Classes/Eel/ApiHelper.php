@@ -4,12 +4,22 @@ namespace Sitegeist\GoldenGate\Neos\Api\Eel;
 use Neos\Flow\Annotations as Flow;
 use Neos\Eel\ProtectedContextAwareInterface;
 use Sitegeist\Goldengate\Dto\Structure\CategoryReference;
+use Sitegeist\Goldengate\Dto\Structure\FilterGroupOptionReference;
 use Sitegeist\Goldengate\Dto\Structure\Product;
 use Sitegeist\Goldengate\Dto\Structure\ProductReference;
+
+use Sitegeist\Goldengate\Dto\Structure\Filter;
+use Sitegeist\Goldengate\Dto\Structure\FilterGroup;
+use Sitegeist\Goldengate\Dto\Structure\FilterGroupOption;
+use Sitegeist\Goldengate\Dto\Structure\FilterGroupReference;
+
 use Sitegeist\Goldengate\Dto\Serializer\ProductSerializer;
 use Sitegeist\Goldengate\Dto\Serializer\ProductReferenceSerializer;
 use Sitegeist\Goldengate\Dto\Serializer\CategorySerializer;
 use Sitegeist\Goldengate\Dto\Serializer\CategoryReferenceSerializer;
+use Sitegeist\Goldengate\Dto\Serializer\FilterSerializer;
+use Sitegeist\Goldengate\Dto\Serializer\FilterGroupSerializer;
+use Sitegeist\Goldengate\Dto\Serializer\FilterGroupReferenceSerializer;
 
 use Sitegeist\GoldenGate\Neos\Api\Exception;
 use Sitegeist\GoldenGate\Neos\Api\Service\ApiService;
@@ -47,6 +57,21 @@ class ApiHelper implements ProtectedContextAwareInterface
     protected $categoryReferenceSerializer;
 
     /**
+     * @var FilterSerializer
+     */
+    protected $filterSerializer;
+
+    /**
+     * @var FilterGroupSerializer
+     */
+    protected $filterGroupSerializer;
+
+    /**
+     * @var FilterGroupReferenceSerializer
+     */
+    protected $filterGroupReferenceSerializer;
+
+    /**
      * ApiHelper constructor.
      */
     public function __construct()
@@ -55,6 +80,9 @@ class ApiHelper implements ProtectedContextAwareInterface
         $this->productReferenceSerializer = new ProductReferenceSerializer();
         $this->categorySerializer = new CategorySerializer();
         $this->categoryReferenceSerializer = new CategoryReferenceSerializer();
+        $this->filterSerializer = new FilterSerializer();
+        $this->filterGroupSerializer = new FilterGroupSerializer();
+        $this->filterGroupReferenceSerializer = new FilterGroupReferenceSerializer();
     }
 
     /**
@@ -80,12 +108,29 @@ class ApiHelper implements ProtectedContextAwareInterface
     /**
      * @param string $shopIdentifier
      * @param Filter $filter
+     * @param float $minPrice
+     * @param float $maxPrice
+     * @param FilterGroupOptionReference[] $filterGroupOptionReferences
      * @param CategoryReferences[] $categoryReferences
      * @return ProductReference[]
      */
-    public function productReferences($shopIdentifier = 'default', $filter = null, $categoryReferences = [] )
+    public function productReferences($shopIdentifier = 'default', $minPrice = null, $maxPrice = null, $filterGroupOptionReferences = [], $categoryReferences = [] )
     {
-        $jsonData = $this->apiService->apiCall($shopIdentifier, 'SitegeistProduct');
+        $parameters = [];
+
+        if ($minPrice || $maxPrice || $filterGroupOptionReferences) {
+            $filter = new Filter();
+            $filter->setMinPrice($minPrice);
+            $filter->setMaxPrice($maxPrice);
+            $filter->setFilterGroupOptionReferences($filterGroupOptionReferences);
+            $parameters['filter'] = $this->filterSerializer->serialize($filter);
+        }
+
+        if ($categoryReferences) {
+            $parameters['categories'] = $this->categoryReferenceSerializer->serializeArray($categoryReferences);
+        }
+
+        $jsonData = $this->apiService->apiCall($shopIdentifier, 'SitegeistProduct', $parameters);
         $productReferences = $this->productReferenceSerializer->deserializeArray($jsonData);
         return $productReferences;
     }
@@ -119,6 +164,37 @@ class ApiHelper implements ProtectedContextAwareInterface
         $data = $this->apiService->apiCall($shopIdentifier, 'SitegeistProductCategory');
         $categoryReference = $this->categoryReferenceSerializer->deserializeArray($data);
         return $categoryReference;
+    }
+
+    /**
+     * @param string|FilterGroupReference $filterGroupReference
+     * @param string $shopIdentifier
+     * @return Product
+     */
+    public function filterGroup($filterGroupReference, $shopIdentifier = 'default')
+    {
+        if ($filterGroupReference instanceof FilterGroupReference) {
+            $id = $filterGroupReference->getId();
+        } elseif (is_string($filterGroupReference)) {
+            $id = $filterGroupReference;
+        } else {
+            throw new Exception(sprintf("id-string or FilterGroupReference was expected but %s given" , get_class($filterGroupReference)));
+        }
+
+        $data = $this->apiService->apiCall($shopIdentifier, 'SitegeistFilterGroup/' . $id);
+        $category =  $this->filterGroupSerializer->deserialize($data);
+        return $category;
+    }
+
+    /**
+     * @param string $shopIdentifier
+     * @return ProductReference[]
+     */
+    public function filterGroupReferences($shopIdentifier = 'default')
+    {
+        $jsonData = $this->apiService->apiCall($shopIdentifier, 'SitegeistFilterGroup');
+        $filterGroups = $this->filterGroupReferenceSerializer->deserializeArray($jsonData);
+        return $filterGroups;
     }
 
     /**

@@ -69,4 +69,28 @@ class ApiCachingAspect
         }
         return $result;
     }
+
+    /**
+     * @Flow\Around("setting(Sitegeist.GoldenGate.Neos.Api.enableCache) && method(Sitegeist\GoldenGate\Neos\Api\Eel\ApiHelper->(filterGroup|filterGroupReferences)())")
+     * @param JoinPointInterface $joinPoint The current join point
+     * @return mixed
+     */
+    public function cacheFilterResults(JoinPointInterface $joinPoint)
+    {
+        $arguments = $joinPoint->getMethodArguments();
+        $methodName = $joinPoint->getMethodName();
+        $entryIdentifier = $methodName . '_' . md5(serialize($arguments));
+        if ($this->shopwareApiCache->has($entryIdentifier)) {
+            $result = unserialize($this->shopwareApiCache->get($entryIdentifier));
+        } else {
+            $result = $joinPoint->getAdviceChain()->proceed($joinPoint);
+            $this->shopwareApiCache->set(
+                $entryIdentifier,
+                serialize($result),
+                [],
+                86400
+            );
+        }
+        return $result;
+    }
 }
