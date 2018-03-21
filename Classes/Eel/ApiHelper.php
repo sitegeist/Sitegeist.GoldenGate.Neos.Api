@@ -110,27 +110,49 @@ class ApiHelper implements ProtectedContextAwareInterface
      * @param Filter $filter
      * @param float $minPrice
      * @param float $maxPrice
-     * @param FilterGroupOptionReference[] $filterGroupOptionReferences
-     * @param CategoryReferences[] $categoryReferences
+     * @param array $filterGroupOptionIds
+     * @param array $categoryIds
      * @return ProductReference[]
      */
-    public function productReferences($shopIdentifier = 'default', $minPrice = null, $maxPrice = null, $filterGroupOptionReferences = [], $categoryReferences = [] )
+    public function productReferences($shopIdentifier = 'default', $minPrice = null, $maxPrice = null, $filterGroupOptionIds = [], $categoryIds = [] )
     {
-        $parameters = [];
 
-        if ($minPrice || $maxPrice || $filterGroupOptionReferences) {
-            $filter = new Filter();
+        $filter = new Filter();
+
+        if ($minPrice) {
             $filter->setMinPrice($minPrice);
+        };
+        if ($maxPrice) {
             $filter->setMaxPrice($maxPrice);
+        }
+
+        if ($filterGroupOptionIds) {
+            $filterGroupOptionReferences = [];
+            foreach ($filterGroupOptionIds as $filterGroupOptionId) {
+                $filterGroupOptionReference = new FilterGroupOptionReference();
+                $filterGroupOptionReference->setId($filterGroupOptionId);
+                $filterGroupOptionReferences[] = $filterGroupOptionReference;
+            }
             $filter->setFilterGroupOptionReferences($filterGroupOptionReferences);
-            $parameters['filter'] = $this->filterSerializer->serialize($filter);
         }
 
-        if ($categoryReferences) {
-            $parameters['categories'] = $this->categoryReferenceSerializer->serializeArray($categoryReferences);
+        if ($categoryIds) {
+            $categoryReferences = [];
+            foreach ($categoryIds as $categoryId) {
+                $categoryReference = new CategoryReference();
+                $categoryReference->setId($categoryId);
+                $categoryReferences[] = $categoryReference;
+            }
+            $filter->setCategoryReferences($categoryReferences);
         }
 
-        $jsonData = $this->apiService->apiCall($shopIdentifier, 'SitegeistProduct', $parameters);
+        $jsonData = $this->apiService->apiCall(
+            $shopIdentifier,
+            'SitegeistProduct',
+            [
+                'filter' => $this->filterSerializer->serialize($filter)
+            ]
+        );
         $productReferences = $this->productReferenceSerializer->deserializeArray($jsonData);
         return $productReferences;
     }

@@ -1,0 +1,7 @@
+Sitegeist:
+  GoldenGate:
+    Neos:
+      Api:
+        log:
+          backendOptions:
+             severityThreshold: '%LOG_INFO%'

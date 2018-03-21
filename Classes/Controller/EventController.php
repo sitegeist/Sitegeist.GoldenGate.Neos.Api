@@ -4,7 +4,6 @@ namespace Sitegeist\GoldenGate\Neos\Api\Controller;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Mvc\Controller\ActionController;
 use Neos\Flow\Mvc\View\JsonView;
-use Neos\Cache\Frontend\FrontendInterface;
 
 use Sitegeist\Goldengate\Dto\Serializer\ProductSerializer;
 use Sitegeist\Goldengate\Dto\Serializer\ProductReferenceSerializer;
@@ -13,6 +12,7 @@ use Sitegeist\Goldengate\Dto\Serializer\CategoryReferenceSerializer;
 
 use Sitegeist\GoldenGate\Neos\Api\Eel\CachingHelper;
 use Sitegeist\GoldenGate\Neos\Api\Service\ConfigurationService;
+use Sitegeist\GoldenGate\Neos\Api\Service\CacheService;
 
 class EventController extends ActionController
 {
@@ -32,19 +32,13 @@ class EventController extends ActionController
      * @var CachingHelper
      * @Flow\Inject
      */
-    protected $shopwareTagHelper;
+    protected $shopwareCachingHelper;
 
     /**
-     * @var FrontendInterface
+     * @var CacheService
      * @Flow\Inject
      */
-    protected $shopwareApiCache;
-
-    /**
-     * @var FrontendInterface
-     * @Flow\Inject
-     */
-    protected $fusionContentCache;
+    protected $cacheService;
 
     /**
      * Notify about changes for a specific product
@@ -62,13 +56,13 @@ class EventController extends ActionController
         if ($product) {
             $productSerializer = new ProductSerializer();
             $product = $productSerializer->deserialize($product);
-            $productTag = $this->shopwareTagHelper->itemTag($shopIdentifier, $product);
-            $this->flushCachesByTag($productTag);
+            $productTag = $this->shopwareCachingHelper->itemTag($shopIdentifier, $product);
+            $this->cacheService->flushCachesByTag($productTag);
         } elseif ($productReference) {
             $productReferenceSerializer = new ProductReferenceSerializer();
             $productReference = $productReferenceSerializer->deserialize($productReference);
-            $productTag = $this->shopwareTagHelper->itemTag($shopIdentifier, $productReference);
-            $this->flushCachesByTag($productTag);
+            $productTag = $this->shopwareCachingHelper->itemTag($shopIdentifier, $productReference);
+            $this->cacheService->flushCachesByTag($productTag);
         } else {
             $this->throwStatus(401, 'No viable input');
         }
@@ -91,14 +85,14 @@ class EventController extends ActionController
         if ($category) {
             $categorySerializer = new CategorySerializer();
             $category = $categorySerializer->deserialize($category);
-            $categoryTag = $this->shopwareTagHelper->itemTag($shopIdentifier, $category);
-            $this->flushCachesByTag($categoryTag);
+            $categoryTag = $this->shopwareCachingHelper->itemTag($shopIdentifier, $category);
+            $this->cacheService->flushCachesByTag($categoryTag);
 
         } elseif ($categoryReference) {
             $categoryReferenceSerializer = new CategoryReferenceSerializer();
             $categoryReference = $categoryReferenceSerializer->deserialize($categoryReference);
-            $categoryTag = $this->shopwareTagHelper->itemTag($shopIdentifier, $categoryReference);
-            $this->flushCachesByTag($categoryTag);
+            $categoryTag = $this->shopwareCachingHelper->itemTag($shopIdentifier, $categoryReference);
+            $this->cacheService->flushCachesByTag($categoryTag);
         } else {
             $this->throwStatus(401, 'No viable input found');
         }
@@ -106,13 +100,6 @@ class EventController extends ActionController
         $this->view->assign('value', ['success' => true]);
     }
 
-    /**
-     * @param string $tag
-     */
-    protected function flushCachesByTag($tag)
-    {
-        $this->fusionContentCache->flushByTag($tag);
-        $this->shopwareApiCache->flushByTag($tag);
-    }
+
 
 }

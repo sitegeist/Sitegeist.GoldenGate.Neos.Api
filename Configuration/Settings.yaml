@@ -16,6 +16,17 @@ Sitegeist:
             user: ~
             password: ~
 
+        log:
+          logger: Neos\Flow\Log\Logger
+          backend: Neos\Flow\Log\Backend\FileBackend
+          backendOptions:
+             logFileURL: '%FLOW_PATH_DATA%Logs/Goldengate.log'
+             createParentDirectories: TRUE
+             severityThreshold: '%LOG_ERR%'
+             maximumLogFileSize: 10485760
+             logFilesToKeep: 1
+             logMessageOrigin: FALSE
+
 Neos:
   Fusion:
     defaultContext:

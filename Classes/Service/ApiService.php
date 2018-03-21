@@ -7,6 +7,7 @@ use Neos\Flow\Http\Uri;
 use Neos\Flow\Http\Client\Browser;
 use Neos\Flow\Http\Client\CurlEngine;
 use Sitegeist\GoldenGate\Neos\Api\Exception;
+use Sitegeist\GoldenGate\Neos\Api\Log\ApiLoggerInterface;
 
 /**
  * @Flow\Scope("singleton")
@@ -19,6 +20,12 @@ class ApiService
      * @Flow\Inject
      */
     protected $configurationService;
+
+    /**
+     * @var ApiLoggerInterface
+     * @Flow\Inject
+     */
+    protected $apiLogger;
 
     /**
      * Request data from the shopware api
@@ -53,9 +60,13 @@ class ApiService
         $response = $browser->sendRequest($request);
 
         if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
+            $message = sprintf('Shopware api call of uri "%s" returned status "%s"', (string)$uri, $response->getStatusCode());
+            $this->apiLogger->log($message);
             return $response->getContent();
         } else {
-            return '';
+            $message = sprintf('Error during shopware api call of uri "%s" with status "%s" and response "%s"', (string)$uri, $response->getStatusCode(), $response->getContent());
+            $this->apiLogger->log($message, LOG_ERR);
+            throw new Exception($message);
         }
     }
 }

@@ -1,4 +1,4 @@
-'Sitegeist\GoldenGate\Neos\Api\Controller\EventController':
+'Sitegeist\GoldenGate\Neos\Api\Service\CacheService':
   properties:
     fusionContentCache:
       object:
@@ -24,3 +24,16 @@
         arguments:
           1:
             value: Sitegeist_GoldenGate_Neos_Api
+
+'Sitegeist\GoldenGate\Neos\Api\Log\ApiLoggerInterface':
+  scope: singleton
+  factoryObjectName: Neos\Flow\Log\LoggerFactory
+  arguments:
+    1:
+      value: 'Goldangate_Api_Logger'
+    2:
+      setting: Sitegeist.GoldenGate.Neos.Api.log.logger
+    3:
+      setting: Sitegeist.GoldenGate.Neos.Api.log.backend
+    4:
+      setting: Sitegeist.GoldenGate.Neos.Api.log.backendOptions

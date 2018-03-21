@@ -8,6 +8,7 @@ use Sitegeist\GoldenGate\Dto\Structure\Product;
 use Sitegeist\GoldenGate\Dto\Structure\ProductReference;
 use Sitegeist\GoldenGate\Dto\Structure\Category;
 use Sitegeist\GoldenGate\Dto\Structure\CategoryReference;
+use Sitegeist\GoldenGate\Neos\Api\Log\ApiLoggerInterface;
 
 /**
  * Class CacheHelper
@@ -25,6 +26,12 @@ class CachingHelper implements ProtectedContextAwareInterface
      * @Flow\InjectConfiguration
      */
     protected $configuration;
+
+    /**
+     * @var ApiLoggerInterface
+     * @Flow\Inject
+     */
+    protected $apiLogger;
 
     /**
      * @param string $shopIdentifier
@@ -60,6 +67,68 @@ class CachingHelper implements ProtectedContextAwareInterface
             },
             $structures
         );
+    }
+
+    /**
+     * @param string $shopIdentifier
+     * @param mixed $data
+     * @return string the tagIdentifier
+     */
+    public function productTag($shopIdentifier, $data)
+    {
+        if (is_string($data)) {
+            return [$this->sanitzeTagIdentifier(self::PRODUCT_TAG_PREFIX . '_' . $shopIdentifier . '_' . (string)$data)];
+        } elseif ($data instanceof Product || $data instanceof ProductReference) {
+            return [$this->sanitzeTagIdentifier(self::PRODUCT_TAG_PREFIX . '_' . $shopIdentifier . '_' . $data->getId())];
+        } elseif (is_array($data) || $data instanceof \Traversable) {
+            $subresults = array_map(
+                function($item) use ($shopIdentifier) {
+                    return $this->productTag($shopIdentifier, $item);
+                },
+                $data
+            );
+            return array_reduce(
+                $subresults,
+                function($carry, $item) {
+                    foreach ($item as $part){
+                        $carry[] = $part;
+                    }
+                },
+                []
+            );
+        }
+        return [];
+    }
+
+    /**
+     * @param string $shopIdentifier
+     * @param mixed $data
+     * @return string the tagIdentifier
+     */
+    public function categoryTag($shopIdentifier, $data)
+    {
+        if (is_string($data)) {
+            return [$this->sanitzeTagIdentifier(self::CATEGORY_TAG_PREFIX . '_' . $shopIdentifier . '_' . (string)$data)];
+        } elseif ($data instanceof Category || $data instanceof CategoryReference) {
+            return [$this->sanitzeTagIdentifier(self::CATEGORY_TAG_PREFIX . '_' . $shopIdentifier . '_' . $data->getId())];
+        } elseif (is_array($data) || $data instanceof \Traversable) {
+            $subresults = array_map(
+                function($item) use ($shopIdentifier) {
+                    return $this->categoryTag($shopIdentifier, $item);
+                },
+                $data
+            );
+            return array_reduce(
+                $subresults,
+                function($carry, $item) {
+                    foreach ($item as $part){
+                        $carry[] = $part;
+                    }
+                },
+                []
+            );
+        }
+        return [];
     }
 
     /**
