@@ -189,11 +189,11 @@ class ApiHelper implements ProtectedContextAwareInterface
     }
 
     /**
-     * @param string|FilterGroupReference $filterGroupReference
      * @param string $shopIdentifier
+     * @param string|FilterGroupReference $filterGroupReference
      * @return Product
      */
-    public function filterGroup($filterGroupReference, $shopIdentifier = 'default')
+    public function filterGroup($shopIdentifier = 'default', $filterGroupReference)
     {
         if ($filterGroupReference instanceof FilterGroupReference) {
             $id = $filterGroupReference->getId();

@@ -1,7 +1,8 @@
 {
+    "name": "sitegeist/goldengate-neos-api",
     "description": "",
     "type": "neos-plugin",
-    "name": "sitegeist/goldengate-neos-api",
+    "license": "GPL-3.0-or-later",
     "require": {
         "neos/flow": "*",
         "sitegeist/goldengate-dto": "*"

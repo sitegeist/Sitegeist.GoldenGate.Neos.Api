@@ -49,20 +49,20 @@ class EventController extends ActionController
      */
     public function productAction($shopIdentifier = 'default', $product = null, $productReference = null)
     {
-        if (!$this->configurationService->hasShopConfiguration($shopIdentifier)) {
+        if (!$this->configurationService->hasShopConfiguration($shopIdentifier)) {x^
             $this->throwStatus(401, 'No viable input');
         }
 
         if ($product) {
             $productSerializer = new ProductSerializer();
             $product = $productSerializer->deserialize($product);
-            $productTag = $this->shopwareCachingHelper->itemTag($shopIdentifier, $product);
-            $this->cacheService->flushCachesByTag($productTag);
+            $productTag = $this->shopwareCachingHelper->productTag($shopIdentifier, $product);
+            $this->cacheService->flushTag($productTag);
         } elseif ($productReference) {
             $productReferenceSerializer = new ProductReferenceSerializer();
             $productReference = $productReferenceSerializer->deserialize($productReference);
-            $productTag = $this->shopwareCachingHelper->itemTag($shopIdentifier, $productReference);
-            $this->cacheService->flushCachesByTag($productTag);
+            $productTag = $this->shopwareCachingHelper->productTag($shopIdentifier, $productReference);
+            $this->cacheService->flushTag($productTag);
         } else {
             $this->throwStatus(401, 'No viable input');
         }
@@ -85,14 +85,13 @@ class EventController extends ActionController
         if ($category) {
             $categorySerializer = new CategorySerializer();
             $category = $categorySerializer->deserialize($category);
-            $categoryTag = $this->shopwareCachingHelper->itemTag($shopIdentifier, $category);
-            $this->cacheService->flushCachesByTag($categoryTag);
-
+            $categoryTag = $this->shopwareCachingHelper->categoryTag($shopIdentifier, $category);
+            $this->cacheService->flushTag($categoryTag);
         } elseif ($categoryReference) {
             $categoryReferenceSerializer = new CategoryReferenceSerializer();
             $categoryReference = $categoryReferenceSerializer->deserialize($categoryReference);
-            $categoryTag = $this->shopwareCachingHelper->itemTag($shopIdentifier, $categoryReference);
-            $this->cacheService->flushCachesByTag($categoryTag);
+            $categoryTag = $this->shopwareCachingHelper->categoryTag($shopIdentifier, $categoryReference);
+            $this->cacheService->flushTag($categoryTag);
         } else {
             $this->throwStatus(401, 'No viable input found');
         }

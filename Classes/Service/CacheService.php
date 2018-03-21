@@ -32,11 +32,21 @@ class CacheService
     /**
      * @param string $tag
      */
-    public function flushCachesByTag($tag)
+    public function flushTag($tag)
     {
         $this->fusionContentCache->flushByTag($tag);
         $this->shopwareApiCache->flushByTag($tag);
         $this->apiLogger->log(sprintf('Invalidated cache tag "%s"', $tag));
+    }
+
+    /**
+     * @param array $tags
+     */
+    public function flushMultipleTags(array $tags)
+    {
+        foreach($tags as $tag) {
+            $this->flushTag($tag);
+        }
     }
 
 }

@@ -4,6 +4,9 @@ namespace Sitegeist\GoldenGate\Neos\Api\Aspect;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Aop\JoinPointInterface;
 use Neos\Cache\Frontend\StringFrontend;
+use Sitegeist\Goldengate\Dto\Structure\Category;
+use Sitegeist\Goldengate\Dto\Structure\CategoryReference;
+use Sitegeist\Goldengate\Dto\Structure\ProductReference;
 use Sitegeist\GoldenGate\Neos\Api\Eel\CachingHelper;
 
 /**
@@ -38,10 +41,16 @@ class ApiCachingAspect
             $result = unserialize($this->shopwareApiCache->get($entryIdentifier));
         } else {
             $result = $joinPoint->getAdviceChain()->proceed($joinPoint);
+            $tags = [];
+            if ($result instanceof ProductReference || $result instanceof Product) {
+                $tags = [$this->shopwareTagHelper->productTag($arguments['shopIdentifier'], $result)];
+            } elseif ($result instanceof CategoryReference || $result instanceof Category) {
+                $tags = [$this->shopwareTagHelper->categoryTag($arguments['shopIdentifier'], $result)];
+            }
             $this->shopwareApiCache->set(
                 $entryIdentifier,
                 serialize($result),
-                [$this->shopwareTagHelper->itemTag($arguments['shopIdentifier'], $result)]
+                $tags
             );
         }
         return $result;
@@ -58,16 +67,24 @@ class ApiCachingAspect
         $methodName = $joinPoint->getMethodName();
         $entryIdentifier = $methodName . '_' . md5(serialize($arguments));
         if ($this->shopwareApiCache->has($entryIdentifier)) {
-            $result = unserialize($this->shopwareApiCache->get($entryIdentifier));
+            $results = unserialize($this->shopwareApiCache->get($entryIdentifier));
         } else {
-            $result = $joinPoint->getAdviceChain()->proceed($joinPoint);
+            $results = $joinPoint->getAdviceChain()->proceed($joinPoint);
+            $tags = [];
+            foreach ($results as $result) {
+                if ($result instanceof ProductReference || $result instanceof Product) {
+                    $tags[] = $this->shopwareTagHelper->productTag($arguments['shopIdentifier'], $result);
+                } elseif ($result instanceof CategoryReference || $result instanceof Category) {
+                    $tags[] = $this->shopwareTagHelper->categoryTag($arguments['shopIdentifier'], $result);
+                }
+            }
             $this->shopwareApiCache->set(
                 $entryIdentifier,
-                serialize($result),
-                $this->shopwareTagHelper->listTag($arguments['shopIdentifier'], $result)
+                serialize($results),
+                $tags
             );
         }
-        return $result;
+        return $results;
     }
 
     /**

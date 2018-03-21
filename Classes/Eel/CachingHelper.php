@@ -35,100 +35,70 @@ class CachingHelper implements ProtectedContextAwareInterface
 
     /**
      * @param string $shopIdentifier
-     * @param Structure $structure
-     * @return string the tagIdentifier
+     * @param mixed $products
+     * @return array tag identifiers
      */
-    public function itemTag($shopIdentifier, Structure $structure)
+    public function productTags($shopIdentifier, $products)
     {
-        switch (true) {
-            case $structure instanceof Product:
-            case $structure instanceof ProductReference:
-                return $this->sanitzeTagIdentifier(self::PRODUCT_TAG_PREFIX . '_' . $shopIdentifier . '_' . $structure->getId());
-                break;
-            case $structure instanceof Category:
-            case $structure instanceof CategoryReference:
-                return $this->sanitzeTagIdentifier(self::CATEGORY_TAG_PREFIX . '_' . $shopIdentifier . '_' . $structure->getId());
-                break;
-            default:
-                throw new \Sitegeist\GoldenGate\Neos\Api\Exception(sprintf("Could not create tag for structure-item of type %s", get_class($structure)));
-        }
-    }
-
-    /**
-     * @param string $shopIdentifier
-     * @param Structure[] $structures
-     * @return string the tagIdentifier
-     */
-    public function listTag($shopIdentifier, $structures)
-    {
-        return array_map(
-            function($structure) use ($shopIdentifier) {
-                return $this->itemTag($shopIdentifier, $structure);
-            },
-            $structures
-        );
-    }
-
-    /**
-     * @param string $shopIdentifier
-     * @param mixed $data
-     * @return string the tagIdentifier
-     */
-    public function productTag($shopIdentifier, $data)
-    {
-        if (is_string($data)) {
-            return [$this->sanitzeTagIdentifier(self::PRODUCT_TAG_PREFIX . '_' . $shopIdentifier . '_' . (string)$data)];
-        } elseif ($data instanceof Product || $data instanceof ProductReference) {
-            return [$this->sanitzeTagIdentifier(self::PRODUCT_TAG_PREFIX . '_' . $shopIdentifier . '_' . $data->getId())];
-        } elseif (is_array($data) || $data instanceof \Traversable) {
-            $subresults = array_map(
-                function($item) use ($shopIdentifier) {
-                    return $this->productTag($shopIdentifier, $item);
-                },
-                $data
-            );
-            return array_reduce(
-                $subresults,
-                function($carry, $item) {
-                    foreach ($item as $part){
-                        $carry[] = $part;
-                    }
-                },
-                []
-            );
+        if (is_array($products) || $products instanceof \Traversable) {
+            $result = [];
+            foreach ($products as $product) {
+                $tag = $this->productTag($shopIdentifier, $product);
+                if ($tag) {
+                    $result[] = $tag;
+                }
+            }
+            return $result;
         }
         return [];
     }
 
     /**
      * @param string $shopIdentifier
-     * @param mixed $data
+     * @param string|Product|ProductReference $data
      * @return string the tagIdentifier
      */
-    public function categoryTag($shopIdentifier, $data)
+    public function productTag($shopIdentifier, $product)
     {
-        if (is_string($data)) {
-            return [$this->sanitzeTagIdentifier(self::CATEGORY_TAG_PREFIX . '_' . $shopIdentifier . '_' . (string)$data)];
-        } elseif ($data instanceof Category || $data instanceof CategoryReference) {
-            return [$this->sanitzeTagIdentifier(self::CATEGORY_TAG_PREFIX . '_' . $shopIdentifier . '_' . $data->getId())];
-        } elseif (is_array($data) || $data instanceof \Traversable) {
-            $subresults = array_map(
-                function($item) use ($shopIdentifier) {
-                    return $this->categoryTag($shopIdentifier, $item);
-                },
-                $data
-            );
-            return array_reduce(
-                $subresults,
-                function($carry, $item) {
-                    foreach ($item as $part){
-                        $carry[] = $part;
-                    }
-                },
-                []
-            );
+        if (is_string($product)) {
+            return $this->sanitizeTagIdentifier(self::PRODUCT_TAG_PREFIX . '_' . $shopIdentifier . '_' . (string)$product);
+        } elseif ($product instanceof Product || $product instanceof ProductReference) {
+            return $this->sanitizeTagIdentifier(self::PRODUCT_TAG_PREFIX . '_' . $shopIdentifier . '_' . $product->getId());
+        }
+    }
+
+    /**
+     * @param string $shopIdentifier
+     * @param mixed $pro$categoriesucts
+     * @return array tag identifiers
+     */
+    public function categoryTags($shopIdentifier, $categories)
+    {
+        if (is_array($categories) || $categories instanceof \Traversable) {
+            $result = [];
+            foreach ($categories as $category) {
+                $tag = $this->categoryTag($shopIdentifier, $category);
+                if ($tag) {
+                    $result[] = $tag;
+                }
+            }
+            return $result;
         }
         return [];
+    }
+
+    /**
+     * @param string $shopIdentifier
+     * @param string|Category|CategoryReference $category
+     * @return string the tagIdentifier
+     */
+    public function categoryTag($shopIdentifier, $category)
+    {
+        if (is_string($category)) {
+            return $this->sanitizeTagIdentifier(self::CATEGORY_TAG_PREFIX . '_' . $shopIdentifier . '_' . (string)$category);
+        } elseif ($category instanceof Category || $category instanceof CategoryReference) {
+            return $this->sanitizeTagIdentifier(self::CATEGORY_TAG_PREFIX . '_' . $shopIdentifier . '_' . $category->getId());
+        }
     }
 
     /**
@@ -137,7 +107,7 @@ class CachingHelper implements ProtectedContextAwareInterface
      * @param string $tagIdentifier
      * @return string
      */
-    protected function sanitzeTagIdentifier(string $tagIdentifier) {
+    protected function sanitizeTagIdentifier(string $tagIdentifier) {
         return preg_replace('/[^a-zA-Z0-9_-]/u', '_', $tagIdentifier);
     }
 
