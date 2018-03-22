@@ -20,7 +20,7 @@ Sitegeist:
           logger: Neos\Flow\Log\Logger
           backend: Neos\Flow\Log\Backend\FileBackend
           backendOptions:
-             logFileURL: '%FLOW_PATH_DATA%Logs/Goldengate.log'
+             logFileURL: '%FLOW_PATH_DATA%Logs/Sitegeist_GoldenGate_Api.log'
              createParentDirectories: TRUE
              severityThreshold: '%LOG_ERR%'
              maximumLogFileSize: 10485760

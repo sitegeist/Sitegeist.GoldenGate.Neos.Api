@@ -4,4 +4,5 @@ Sitegeist:
       Api:
         log:
           backendOptions:
-             severityThreshold: '%LOG_INFO%'
+            logFileURL: '%FLOW_PATH_DATA%Logs/Sitegeist_GoldenGate_Api_Development.log'
+            severityThreshold: '%LOG_INFO%'
