@@ -2,9 +2,17 @@ Sitegeist:
   GoldenGate:
     Neos:
       Api:
+        #
+        # Enable caching of api-requests
+        #
         enableCache: true
 
+        #
+        # Available shopware-connections. By default the `default` key will be used if nothing
+        # else is defined.
+        #
         shops:
+
           default:
             title: 'Default Shop'
 
@@ -16,6 +24,9 @@ Sitegeist:
             user: ~
             password: ~
 
+        #
+        # Shopware API Logger
+        #
         log:
           logger: Neos\Flow\Log\Logger
           backend: Neos\Flow\Log\Backend\FileBackend

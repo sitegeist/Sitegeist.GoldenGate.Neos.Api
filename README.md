@@ -35,7 +35,6 @@ Sitegeist:
         shops:
           default:
             title: 'Default Shop'
-            subshop: ~
 
             # connection
             protocol: ~
@@ -60,9 +59,9 @@ sitegeist/goldengate-dto. See https://github.com/sitegeist/Sitegeist.GoldenGate.
 
  - `Shopware.Api.productReferences( shopIdentifier = 'default', minPrice = null, maxPrice = null, filterGroupOptionIds = [], categoryIds = [])`
    : Find productReferences and optionally pass arguments.
- - `Shopware.Api.product( shopIdentifier = 'default', product)` : Complete product, accepts productReference or id.
+ - `Shopware.Api.product( shopIdentifier = 'default', product)` : Complete product, accepts productReference or id-strings.
  - `Shopware.Api.categoryReferences( shopIdentifier = 'default')` : All available category-references.
- - `Shopware.Api.category( shopIdentifier = 'default', category)` : Complete category, accepts categoryReference or id.
+ - `Shopware.Api.category( shopIdentifier = 'default', category)` : Complete category, accepts categoryReference or id-strings.
  - `Shopware.Api.filterGroupReferences( shopIdentifier = 'default')` : All available filterGroup-references.
  - `Shopware.Api.filterGroup( shopIdentifier = 'default',  filterGroupReference )` : Complete FilterGroup with all options.
 
@@ -78,8 +77,10 @@ Neos_Fusion_Content and the Sitegeist_GoldenGate_Neos_Api. By tagging
 fusion content with such tags it can be ensured that this items are
 revaluated once items were updated in shopware. (see Event-API below).
 
- - `Shopware.Api.Cache.productTag` : Render cache tags for shopware-products, accepts IDs, Products, ProductReferences and arrays of those
- - `Shopware.Api.Cache.categoryTag` : Render cache tags for shopware-categories, accepts IDs, Products, ProductReferences and arrays of those
+ - `Shopware.Api.Cache.productTag` : Render cache tag for shopware-products, id-strings, Products, ProductReferences
+ - `Shopware.Api.Cache.productTags` : Render multiple product tags as array, uses `Shopware.Api.Cache.productTag` internally.
+ - `Shopware.Api.Cache.categoryTag` : Render cache tags for shopware-categories, id-strings, Products, ProductReferences
+ - `Shopware.Api.Cache.categoryTags` : Render multiple category tags as array, uses `Shopware.Api.Cache.categoryTag` internally.
 
 ## Caches
 
