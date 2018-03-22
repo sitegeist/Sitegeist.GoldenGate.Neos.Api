@@ -4,9 +4,10 @@ namespace Sitegeist\GoldenGate\Neos\Api\Aspect;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Aop\JoinPointInterface;
 use Neos\Cache\Frontend\StringFrontend;
+use Sitegeist\Goldengate\Dto\Structure\Product;
+use Sitegeist\Goldengate\Dto\Structure\ProductReference;
 use Sitegeist\Goldengate\Dto\Structure\Category;
 use Sitegeist\Goldengate\Dto\Structure\CategoryReference;
-use Sitegeist\Goldengate\Dto\Structure\ProductReference;
 use Sitegeist\GoldenGate\Neos\Api\Eel\CachingHelper;
 
 /**
