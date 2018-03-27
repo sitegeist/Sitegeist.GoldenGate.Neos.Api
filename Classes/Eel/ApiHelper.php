@@ -107,7 +107,6 @@ class ApiHelper implements ProtectedContextAwareInterface
 
     /**
      * @param string $shopIdentifier
-     * @param Filter $filter
      * @param float $minPrice
      * @param float $maxPrice
      * @param array $filterGroupOptionIds
