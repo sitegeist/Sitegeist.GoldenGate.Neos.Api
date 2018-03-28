@@ -115,42 +115,45 @@ class ApiHelper implements ProtectedContextAwareInterface
      */
     public function productReferences($shopIdentifier = 'default', $minPrice = null, $maxPrice = null, $filterGroupOptionIds = [], $categoryIds = [] )
     {
+        $parameters = [];
 
-        $filter = new Filter();
+        if ($minPrice || $maxPrice || $filterGroupOptionIds || $categoryIds) {
+            $filter = new Filter();
 
-        if ($minPrice) {
-            $filter->setMinPrice($minPrice);
-        };
-        if ($maxPrice) {
-            $filter->setMaxPrice($maxPrice);
-        }
-
-        if ($filterGroupOptionIds) {
-            $filterGroupOptionReferences = [];
-            foreach ($filterGroupOptionIds as $filterGroupOptionId) {
-                $filterGroupOptionReference = new FilterGroupOptionReference();
-                $filterGroupOptionReference->setId($filterGroupOptionId);
-                $filterGroupOptionReferences[] = $filterGroupOptionReference;
+            if ($minPrice) {
+                $filter->setMinPrice($minPrice);
+            };
+            if ($maxPrice) {
+                $filter->setMaxPrice($maxPrice);
             }
-            $filter->setFilterGroupOptionReferences($filterGroupOptionReferences);
-        }
 
-        if ($categoryIds) {
-            $categoryReferences = [];
-            foreach ($categoryIds as $categoryId) {
-                $categoryReference = new CategoryReference();
-                $categoryReference->setId($categoryId);
-                $categoryReferences[] = $categoryReference;
+            if ($filterGroupOptionIds) {
+                $filterGroupOptionReferences = [];
+                foreach ($filterGroupOptionIds as $filterGroupOptionId) {
+                    $filterGroupOptionReference = new FilterGroupOptionReference();
+                    $filterGroupOptionReference->setId($filterGroupOptionId);
+                    $filterGroupOptionReferences[] = $filterGroupOptionReference;
+                }
+                $filter->setFilterGroupOptionReferences($filterGroupOptionReferences);
             }
-            $filter->setCategoryReferences($categoryReferences);
+
+            if ($categoryIds) {
+                $categoryReferences = [];
+                foreach ($categoryIds as $categoryId) {
+                    $categoryReference = new CategoryReference();
+                    $categoryReference->setId($categoryId);
+                    $categoryReferences[] = $categoryReference;
+                }
+                $filter->setCategoryReferences($categoryReferences);
+            }
+
+            $parameters['filter'] = $this->filterSerializer->serialize($filter);
         }
 
         $jsonData = $this->apiService->apiCall(
             $shopIdentifier,
             'SitegeistProduct',
-            [
-                'filter' => $this->filterSerializer->serialize($filter)
-            ]
+            $parameters
         );
         $productReferences = $this->productReferenceSerializer->deserializeArray($jsonData);
         return $productReferences;
